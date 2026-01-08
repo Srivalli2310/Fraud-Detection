@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudCheck</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+    <h1 id="h1tag">FraudCheck</h1>
+    <p>A quick tool to check risk levels for internship links</p>
+
+    <h2>Quick-Check</h2>
+    <p>Paste an internship URL and/or message</p>
+
+    <label style="color:white">URL :</label><br>
+    <input type="text" id="urlInput" placeholder="https://name.com" style="width:50%;">
+    <br><br><br>
+
+    <label style="color:white">Message:</label><br>
+    <textarea id="messageInput" placeholder="Paste the message content you received" rows="4" style="width:50%;"></textarea>
+    <br><br><br>
+
+    <button id="check" onclick="checkRisk()">Check Now!</button>
+    <button id="clear" onclick="clearText()">Clear</button>
+
+    <p id="result" style="margin-left:20%; font-size:20px; font-weight:bold;"></p>
+
+    <script>
+        function checkRisk() {
+            const url = document.getElementById("urlInput").value.trim();
+            const message = document.getElementById("messageInput").value.trim();
+
+            if (url === "" && message === "") {
+                const result = document.getElementById("result");
+                result.innerText = "Please enter a URL or message!";
+                result.style.color = "yellow";
+                return;
+            }
+
+            // Combine URL + message into ONE text
+            const combinedText = "URL: " + url + " MESSAGE: " + message;
+
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text: combinedText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const result = document.getElementById("result");
+
+                result.innerHTML =
+                    "Prediction: " + data.prediction +
+                    "<br>Risk Level: " + data.risk_level;
+
+                if (data.risk_level === "HIGH RISK") {
+                    result.style.color = "red";
+                } else {
+                    result.style.color = "lightgreen";
+                }
+            })
+            .catch(() => {
+                const result = document.getElementById("result");
+                result.innerText = "Backend server is not running!";
+                result.style.color = "orange";
+            });
+        }
+
+        function clearText() {
+            document.getElementById("urlInput").value = "";
+            document.getElementById("messageInput").value = "";
+            document.getElementById("result").innerText = "";
+        }
+    </script>
+</body>
+</html>

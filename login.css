@@ -1,0 +1,18 @@
+body{
+    background-color: rgb(5, 5, 42);
+}
+h1,p{
+    color:white;
+}
+h2{
+    color:aqua;
+}              
+#check{
+    height: 35px;
+    color:black;
+    background-color:darksalmon;
+}
+#clear{
+    height:35px;
+    
+}
